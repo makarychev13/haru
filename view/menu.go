@@ -9,7 +9,8 @@ import (
 )
 
 const (
-	header = `██╗  ██╗ █████╗ ██████╗ ██╗   ██╗
+	version = "v0.0.1"
+	header  = `██╗  ██╗ █████╗ ██████╗ ██╗   ██╗
 ██║  ██║██╔══██╗██╔══██╗██║   ██║
 ███████║███████║██████╔╝██║   ██║
 ██╔══██║██╔══██║██╔══██╗██║   ██║
@@ -19,10 +20,18 @@ const (
 
 var (
 	styleWrap = lipgloss.
-		NewStyle().
-		Bold(true).
-		Align(lipgloss.Center).
-		Padding(2)
+			NewStyle().
+			Align(lipgloss.Center).
+			Padding(2)
+
+	styleChoice = lipgloss.
+			NewStyle().
+			Padding(1). //TODO: WTF???
+			Align(lipgloss.Left)
+
+	styleVersion = lipgloss.
+			NewStyle().
+			Foreground(lipgloss.Color("#9B9B9B"))
 )
 
 type Menu struct {
@@ -33,9 +42,8 @@ type Menu struct {
 func NewMenu() Menu {
 	return Menu{
 		items: []string{
-			"Открыть хранилище",
 			"Добавить хранилище",
-			"Настройки",
+			"Открыть хранилище",
 			"Выход",
 		},
 		cursor: 0,
@@ -50,7 +58,6 @@ func (m Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch msg.String() {
-
 		case tea.KeyCtrlC.String():
 			return m, tea.Quit
 		case tea.KeyDown.String():
@@ -75,6 +82,8 @@ func (m Menu) View() string {
 	sb.WriteString(header)
 	sb.WriteString("\n\n")
 
+	var sbChoice strings.Builder
+
 	for i, v := range m.items {
 		var b string
 
@@ -84,12 +93,12 @@ func (m Menu) View() string {
 			b = v
 		}
 
-		sb.WriteString(b)
+		sbChoice.WriteString(b)
 
 		if i != len(m.items)-1 {
-			sb.WriteString("\n")
+			sbChoice.WriteString("\n")
 		}
 	}
 
-	return styleWrap.Render(sb.String())
+	return styleWrap.Render(sb.String(), styleChoice.Render(sbChoice.String()), "\n", styleVersion.Render(version))
 }
