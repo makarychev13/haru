@@ -26,8 +26,9 @@ var (
 
 	styleChoice = lipgloss.
 			NewStyle().
-			Padding(1). //TODO: WTF???
-			Align(lipgloss.Left)
+
+		//Padding(1). //TODO: WTF???
+		Align(lipgloss.Left)
 
 	styleVersion = lipgloss.
 			NewStyle().
@@ -42,7 +43,7 @@ type Menu struct {
 func NewMenu() Menu {
 	return Menu{
 		items: []string{
-			"Добавить хранилище",
+			"Новое хранилище",
 			"Открыть хранилище",
 			"Выход",
 		},
@@ -100,5 +101,10 @@ func (m Menu) View() string {
 		}
 	}
 
-	return styleWrap.Render(sb.String(), styleChoice.Render(sbChoice.String()), "\n", styleVersion.Render(version))
+	s := sb.String() +
+		styleChoice.Render(sbChoice.String()) +
+		"\n\n" +
+		styleVersion.Render(version)
+
+	return styleWrap.Render(s)
 }
