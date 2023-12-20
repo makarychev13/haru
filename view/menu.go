@@ -26,9 +26,7 @@ var (
 
 	styleChoice = lipgloss.
 			NewStyle().
-
-		//Padding(1). //TODO: WTF???
-		Align(lipgloss.Left)
+			Align(lipgloss.Left)
 
 	styleVersion = lipgloss.
 			NewStyle().
@@ -45,7 +43,7 @@ func NewMenu() Menu {
 		items: []string{
 			"Новое хранилище",
 			"Открыть хранилище",
-			"Выход",
+			"О программе",
 		},
 		cursor: 0,
 	}
@@ -91,7 +89,7 @@ func (m Menu) View() string {
 		if i == int(m.cursor) {
 			b = style.SelectedButton.Render(v)
 		} else {
-			b = v
+			b = style.UnselectedButton.Render(v)
 		}
 
 		sbChoice.WriteString(b)
@@ -101,10 +99,9 @@ func (m Menu) View() string {
 		}
 	}
 
-	s := sb.String() +
-		styleChoice.Render(sbChoice.String()) +
-		"\n\n" +
-		styleVersion.Render(version)
+	sb.WriteString(styleChoice.Render(sbChoice.String()))
+	sb.WriteString("\n\n")
+	sb.WriteString(styleVersion.Render(version))
 
-	return styleWrap.Render(s)
+	return styleWrap.Render(sb.String())
 }
