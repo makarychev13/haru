@@ -5,6 +5,7 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/makarychev13/haru/pkg/cursor"
 	"github.com/makarychev13/haru/style"
 )
 
@@ -34,17 +35,17 @@ var (
 )
 
 type Menu struct {
-	items  []string
+	cur    *cursor.Cursor[string]
 	cursor int
 }
 
 func NewMenu() Menu {
 	return Menu{
-		items: []string{
-			"Новое хранилище",
-			"Открыть хранилище",
-			"О программе",
-		},
+		cur: cursor.NewCursor[string](
+			"New vault",
+			"Open vault",
+			"About",
+		),
 		cursor: 0,
 	}
 }
@@ -60,15 +61,9 @@ func (m Menu) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC.String():
 			return m, tea.Quit
 		case tea.KeyDown.String():
-			m.cursor++
-			if m.cursor == len(m.items) {
-				m.cursor = 0
-			}
+			m.cur.Inc()
 		case tea.KeyUp.String():
-			m.cursor--
-			if m.cursor < 0 {
-				m.cursor = len(m.items) - 1
-			}
+			m.cur.Dec()
 		}
 	}
 
@@ -83,10 +78,10 @@ func (m Menu) View() string {
 
 	var sbChoice strings.Builder
 
-	for i, v := range m.items {
+	for i, v := range m.cur.AllValues() {
 		var b string
 
-		if i == int(m.cursor) {
+		if i == m.cur.Index() {
 			b = style.SelectedButton.Render(v)
 		} else {
 			b = style.UnselectedButton.Render(v)
@@ -94,7 +89,7 @@ func (m Menu) View() string {
 
 		sbChoice.WriteString(b)
 
-		if i != len(m.items)-1 {
+		if i != len(m.cur.AllValues())-1 {
 			sbChoice.WriteString("\n")
 		}
 	}
